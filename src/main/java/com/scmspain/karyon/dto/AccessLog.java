@@ -1,6 +1,6 @@
 package com.scmspain.karyon.dto;
 
-import io.reactivex.netty.protocol.http.server.HttpServerRequest;
+import com.scmspain.karyon.formatters.AccessLogFormatter;
 
 import java.util.Date;
 
@@ -33,6 +33,10 @@ public class AccessLog {
     this.userAgent = userAgent;
   }
 
+  public Date date() {
+    return timestamp;
+  }
+
   public String httpVersion() {
     return this.httpVersion;
   }
@@ -51,5 +55,9 @@ public class AccessLog {
 
   public String userAgent() {
     return userAgent;
+  }
+
+  public String format(AccessLogFormatter logFormatter) {
+    return logFormatter.format(this);
   }
 }

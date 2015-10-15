@@ -1,6 +1,8 @@
 package com.scmspain.karyon.interceptors;
 
+import com.google.inject.Inject;
 import com.scmspain.karyon.dto.AccessLog;
+import com.scmspain.karyon.formatters.AccessLogFormatter;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AttributeKey;
@@ -12,13 +14,18 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 public class AccessLogInterceptor
     implements DuplexInterceptor<HttpServerRequest<ByteBuf>, HttpServerResponse<ByteBuf>> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AccessLogInterceptor.class);
   public static AttributeKey<AccessLog> accessAttribute = AttributeKey.valueOf("accessAttribute");
+  private final AccessLogFormatter logFormatter;
+
+  @Inject
+  AccessLogInterceptor(AccessLogFormatter logFormatter) {
+    this.logFormatter = logFormatter;
+  }
 
   @Override
   public Observable<Void> in(
@@ -36,7 +43,7 @@ public class AccessLogInterceptor
   public Observable<Void> out(HttpServerResponse<ByteBuf> response) {
     AccessLog logLine = response.getChannel().attr(accessAttribute).get();
 
-    LOGGER.info(logLine.toString());
+    LOGGER.info(logLine.format(logFormatter));
 
     return Observable.empty();
   }
