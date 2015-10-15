@@ -8,16 +8,57 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AccessLogTest {
+  private String httpVersion;
+  private String method;
+  private String uri;
+
+  private String clientIp;
+  private String userAgent;
+
+  private AccessLog log;
+
   @Test
   public void testItShouldBeBuiltRequestInformation() throws Exception {
-    final String httpVersion = HttpVersion.HTTP_1_0.toString();
-    final String method = HttpMethod.GET.toString();
-    final String uri = "/status";
+    givenARequest();
+    whenAccessLogIsCreated();
+    thenLogShouldContainRequestInformation();
+  }
 
-    AccessLog log = new AccessLog(httpVersion, method, uri);
+  @Test
+  public void testItShouldBeBuiltWithUserInformation() throws Exception {
+    givenARequestWithUserInformation();
+    whenAccessLogIsCreatedWithUserInfo();
+    thenLogShouldContainUserInformation();
+  }
 
+  private void givenARequest() {
+    httpVersion = HttpVersion.HTTP_1_0.toString();
+    method = HttpMethod.GET.toString();
+    uri = "/status";
+  }
+
+  private void givenARequestWithUserInformation() {
+    givenARequest();
+    clientIp = "127.0.0.1";
+    userAgent = "Curl";
+  }
+
+  private void whenAccessLogIsCreated() {
+    log = new AccessLog(httpVersion, method, uri);
+  }
+
+  private void whenAccessLogIsCreatedWithUserInfo() {
+    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent);
+  }
+
+  private void thenLogShouldContainRequestInformation() {
     assertThat(log.httpVersion(), is(httpVersion));
     assertThat(log.method(), is(method));
     assertThat(log.uri(), is(uri));
+  }
+
+  private void thenLogShouldContainUserInformation() {
+    assertThat(log.clientIp(), is(clientIp));
+    assertThat(log.userAgent(), is(userAgent));
   }
 }
