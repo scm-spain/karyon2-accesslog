@@ -1,7 +1,7 @@
-package com.scmspain.karyon.formatters;
+package com.scmspain.karyon.accesslog.formatters;
 
 import com.google.inject.Inject;
-import com.scmspain.karyon.dto.AccessLog;
+import com.scmspain.karyon.accesslog.dto.AccessLog;
 
 public class CombinedApacheLog implements AccessLogFormatter {
 

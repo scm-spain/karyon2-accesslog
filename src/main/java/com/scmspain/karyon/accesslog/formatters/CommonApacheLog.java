@@ -1,6 +1,6 @@
-package com.scmspain.karyon.formatters;
+package com.scmspain.karyon.accesslog.formatters;
 
-import com.scmspain.karyon.dto.AccessLog;
+import com.scmspain.karyon.accesslog.dto.AccessLog;
 
 import java.text.SimpleDateFormat;
 

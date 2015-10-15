@@ -1,8 +1,8 @@
-package com.scmspain.karyon.interceptors;
+package com.scmspain.karyon.accesslog.interceptors;
 
 import com.google.inject.Inject;
-import com.scmspain.karyon.dto.AccessLog;
-import com.scmspain.karyon.formatters.AccessLogFormatter;
+import com.scmspain.karyon.accesslog.dto.AccessLog;
+import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AttributeKey;

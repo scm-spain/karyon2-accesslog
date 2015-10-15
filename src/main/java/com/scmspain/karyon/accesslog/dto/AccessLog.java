@@ -1,6 +1,6 @@
-package com.scmspain.karyon.dto;
+package com.scmspain.karyon.accesslog.dto;
 
-import com.scmspain.karyon.formatters.AccessLogFormatter;
+import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
 
 import java.util.Date;
 
