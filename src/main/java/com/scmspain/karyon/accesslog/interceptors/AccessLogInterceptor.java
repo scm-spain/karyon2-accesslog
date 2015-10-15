@@ -43,6 +43,7 @@ public class AccessLogInterceptor
   public Observable<Void> out(HttpServerResponse<ByteBuf> response) {
     AccessLog logLine = response.getChannel().attr(accessAttribute).get();
 
+    // TODO: gather and log response information such as time, status and bytes.
     LOGGER.info(logLine.format(logFormatter));
 
     return Observable.empty();
