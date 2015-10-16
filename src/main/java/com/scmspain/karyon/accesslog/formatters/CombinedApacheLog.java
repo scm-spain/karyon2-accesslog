@@ -14,6 +14,6 @@ public class CombinedApacheLog implements AccessLogFormatter {
 
   @Override
   public String format(AccessLog logLine) {
-    return String.format("%s - %s", commonApacheLogFormatter.format(logLine), logLine.userAgent());
+    return String.format("%s \"%s\" \"%s\"", commonApacheLogFormatter.format(logLine), logLine.referer(), logLine.userAgent());
   }
 }

@@ -14,6 +14,11 @@ public class AccessLogTest {
 
   private String clientIp;
   private String userAgent;
+  private String referer;
+
+  private Integer statusCode;
+  private Long timeTaken;
+  private Long responseSize;
 
   private AccessLog log;
 
@@ -31,6 +36,16 @@ public class AccessLogTest {
     thenLogShouldContainUserInformation();
   }
 
+  @Test
+  public void testItShouldBeBuiltWithResponseInformation() throws Exception {
+    givenARequest();
+    statusCode = 200;
+    timeTaken = (long) 123456;
+    responseSize = (long) 123456;
+    whenAccessLogIsCreatedWithResponseInfo();
+    thenLogShouldContainResponseInformation();
+  }
+
   private void givenARequest() {
     httpVersion = HttpVersion.HTTP_1_0.toString();
     method = HttpMethod.GET.toString();
@@ -41,6 +56,7 @@ public class AccessLogTest {
     givenARequest();
     clientIp = "127.0.0.1";
     userAgent = "Curl";
+    referer = "/some_referer.html";
   }
 
   private void whenAccessLogIsCreated() {
@@ -48,7 +64,11 @@ public class AccessLogTest {
   }
 
   private void whenAccessLogIsCreatedWithUserInfo() {
-    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent);
+    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent, referer);
+  }
+
+  private void whenAccessLogIsCreatedWithResponseInfo() {
+    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent, referer, statusCode, timeTaken, responseSize);
   }
 
   private void thenLogShouldContainRequestInformation() {
@@ -60,5 +80,12 @@ public class AccessLogTest {
   private void thenLogShouldContainUserInformation() {
     assertThat(log.clientIp(), is(clientIp));
     assertThat(log.userAgent(), is(userAgent));
+    assertThat(log.referer(), is(referer));
+  }
+
+  private void thenLogShouldContainResponseInformation() {
+    assertThat(log.statusCode(), is(statusCode));
+    assertThat(log.timeTaken(), is(timeTaken));
+    assertThat(log.responseSize(), is(responseSize));
   }
 }
