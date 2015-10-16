@@ -43,7 +43,8 @@ public class AccessLogInterceptor
 
   @Override
   public Observable<Void> out(HttpServerResponse<ByteBuf> response) {
-    AccessLog logLine = buildAccessLogWith(response, response.getChannel().attr(accessAttribute).get());
+    AccessLog logLine = buildAccessLogWith(
+        response, response.getChannel().attr(accessAttribute).get());
 
     // TODO: gather and log response bytes.
     LOGGER.info(logLine.format(logFormatter));

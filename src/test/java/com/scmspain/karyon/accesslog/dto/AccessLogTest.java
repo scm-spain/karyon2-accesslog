@@ -68,7 +68,17 @@ public class AccessLogTest {
   }
 
   private void whenAccessLogIsCreatedWithResponseInfo() {
-    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent, referer, statusCode, timeTaken, responseSize);
+    log = new AccessLog(
+        httpVersion,
+        method,
+        uri,
+        clientIp,
+        userAgent,
+        referer,
+        statusCode,
+        timeTaken,
+        responseSize
+    );
   }
 
   private void thenLogShouldContainRequestInformation() {

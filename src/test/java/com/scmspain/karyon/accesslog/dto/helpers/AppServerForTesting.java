@@ -12,9 +12,9 @@ import rx.Observable;
 
 @KaryonBootstrap(name = "AppServer")
 @Modules(
-  include = {
-    AppServerForTesting.AppServer.class
-  })
+    include = {
+        AppServerForTesting.AppServer.class
+    })
 public interface AppServerForTesting {
   class AppServer extends KaryonHttpModule<ByteBuf, ByteBuf> {
     public static final int DEFAULT_PORT = 8000;
@@ -46,7 +46,7 @@ public interface AppServerForTesting {
       ) {
 
         SimpleUriRouter router = new SimpleUriRouter<ByteBuf, ByteBuf>()
-          .addUri("/sample", (req, res) -> res.writeStringAndFlush("Hello!"));
+            .addUri("/sample", (req, res) -> res.writeStringAndFlush("Hello!"));
 
         return router.handle(request, response);
       }

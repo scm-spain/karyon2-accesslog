@@ -35,14 +35,14 @@ public class AccessLogIntegrationTest {
   @Test
   public void itShouldReturnSuccessCodeStatus() throws Exception {
 
-    String body = RxNetty.createHttpClient("localhost",
-      AppServerForTesting.AppServer.DEFAULT_PORT)
-      .submit(HttpClientRequest.createGet("/sample"))
-      .doOnNext(response -> assertThat(response.getStatus(), is(HttpResponseStatus.OK)))
-      .flatMap(HttpClientResponse::getContent)
-      .map(content -> content.toString(Charset.defaultCharset()))
-      .timeout(10, TimeUnit.SECONDS)
-      .toBlocking().single();
+    String body = RxNetty.createHttpClient("localhost", AppServerForTesting.AppServer.DEFAULT_PORT)
+        .submit(HttpClientRequest.createGet("/sample"))
+        .doOnNext(response -> assertThat(response.getStatus(), is(HttpResponseStatus.OK)))
+        .flatMap(HttpClientResponse::getContent)
+        .map(content -> content.toString(Charset.defaultCharset()))
+        .timeout(5, TimeUnit.SECONDS)
+        .toBlocking()
+        .single();
 
     assertThat(body, is("Hello!"));
   }
