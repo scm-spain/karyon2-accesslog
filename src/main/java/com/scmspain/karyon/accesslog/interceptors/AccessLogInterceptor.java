@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.time.Instant;
 
 public class AccessLogInterceptor
     implements DuplexInterceptor<HttpServerRequest<ByteBuf>, HttpServerResponse<ByteBuf>> {
@@ -41,9 +43,9 @@ public class AccessLogInterceptor
 
   @Override
   public Observable<Void> out(HttpServerResponse<ByteBuf> response) {
-    AccessLog logLine = response.getChannel().attr(accessAttribute).get();
+    AccessLog logLine = buildAccessLogWith(response, response.getChannel().attr(accessAttribute).get());
 
-    // TODO: gather and log response information such as time, status and bytes.
+    // TODO: gather and log response bytes.
     LOGGER.info(logLine.format(logFormatter));
 
     return Observable.empty();
@@ -55,7 +57,22 @@ public class AccessLogInterceptor
       request.getHttpMethod().toString(),
       request.getUri(),
       ((InetSocketAddress) request.getNettyChannel().remoteAddress()).getAddress().getHostAddress(),
-      request.getHeaders().getHeader(HttpHeaders.Names.USER_AGENT)
+      request.getHeaders().getHeader(HttpHeaders.Names.USER_AGENT),
+      request.getHeaders().getHeader(HttpHeaders.Names.REFERER)
+    );
+  }
+
+  private AccessLog buildAccessLogWith(HttpServerResponse<ByteBuf> response, AccessLog accessLog) {
+    return new AccessLog(
+      accessLog.httpVersion(),
+      accessLog.method(),
+      accessLog.uri(),
+      accessLog.clientIp(),
+      accessLog.userAgent(),
+      accessLog.referer(),
+      response.getStatus().code(),
+      Duration.between(accessLog.date().toInstant(), Instant.now()).toMillis(),
+      (long) 0
     );
   }
 }
