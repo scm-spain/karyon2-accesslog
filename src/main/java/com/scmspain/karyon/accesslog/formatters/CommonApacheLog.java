@@ -15,7 +15,7 @@ public class CommonApacheLog implements AccessLogFormatter{
       logLine.uri(),
       logLine.httpVersion(),
       logLine.statusCode(),
-      "0f"
+      (float) 0
     );
   }
 }
