@@ -28,13 +28,14 @@ public class AccessLogInterceptor
 
   public static AttributeKey<AccessLog> accessAttribute = AttributeKey.valueOf("accessAttribute");
   private final AccessLogFormatter logFormatter;
-  @Inject private Injector injector;
 
   @Inject
-  AccessLogInterceptor(AccessLogFormatter logFormatter) {
-    this.logFormatter = (null != logFormatter)
-      ? logFormatter
-      : injector.getInstance(DEFAULT_FORMATTER);
+  AccessLogInterceptor(Injector injector, AccessLogFormatterHolder logFormatterHolder) {
+    if (null == logFormatterHolder.value) {
+      logFormatterHolder.value = injector.getInstance(DEFAULT_FORMATTER);
+    }
+
+    this.logFormatter = logFormatterHolder.value;
   }
 
   @Override
@@ -83,5 +84,9 @@ public class AccessLogInterceptor
       Duration.between(accessLog.date().toInstant(), Instant.now()).toMillis(),
       (long) 0
     );
+  }
+
+  private static class AccessLogFormatterHolder {
+    @Inject(optional = true) AccessLogFormatter value;
   }
 }
