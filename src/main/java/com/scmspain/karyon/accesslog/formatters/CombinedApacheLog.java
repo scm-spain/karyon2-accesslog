@@ -17,8 +17,12 @@ public class CombinedApacheLog implements AccessLogFormatter {
     return String.format(
       "%s \"%s\" \"%s\"",
       commonApacheLogFormatter.format(logLine),
-      logLine.referer(),
-      logLine.userAgent()
+      valueOrDefault(logLine.referer()),
+      valueOrDefault(logLine.userAgent())
     );
+  }
+
+  private String valueOrDefault(String value) {
+    return (!value.isEmpty()) ? value : "-";
   }
 }
