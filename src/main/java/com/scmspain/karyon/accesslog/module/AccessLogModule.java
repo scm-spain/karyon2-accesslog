@@ -9,7 +9,6 @@ public class AccessLogModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(AccessLogFormatter.class).to(JsonLog.class);
     bind(GsonBuilder.class).asEagerSingleton();
   }
 }

@@ -1,6 +1,8 @@
 package com.scmspain.karyon.accesslog.dto.helpers;
 
 import com.netflix.governator.annotations.Modules;
+import com.scmspain.karyon.accesslog.interceptors.AccessLogInterceptor;
+import com.scmspain.karyon.accesslog.module.AccessLogModule;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.server.HttpServerRequest;
 import io.reactivex.netty.protocol.http.server.HttpServerResponse;
@@ -13,7 +15,8 @@ import rx.Observable;
 @KaryonBootstrap(name = "AppServer")
 @Modules(
     include = {
-        AppServerForTesting.AppServer.class
+        AppServerForTesting.AppServer.class,
+        AccessLogModule.class
     })
 public interface AppServerForTesting {
   class AppServer extends KaryonHttpModule<ByteBuf, ByteBuf> {
@@ -26,6 +29,7 @@ public interface AppServerForTesting {
 
     @Override
     protected void configureServer() {
+      interceptorSupport().forUri("/*").intercept(AccessLogInterceptor.class);
       server()
         .port(DEFAULT_PORT)
         .threadPoolSize(DEFAULT_THREADS_POOL_SIZE);
