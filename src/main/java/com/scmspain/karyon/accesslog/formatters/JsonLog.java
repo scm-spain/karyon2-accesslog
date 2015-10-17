@@ -2,7 +2,7 @@ package com.scmspain.karyon.accesslog.formatters;
 
 import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
-import com.scmspain.karyon.accesslog.dto.AccessLog;
+import com.scmspain.karyon.accesslog.AccessLog;
 
 public class JsonLog implements AccessLogFormatter {
 

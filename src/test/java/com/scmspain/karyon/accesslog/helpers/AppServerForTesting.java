@@ -1,4 +1,4 @@
-package com.scmspain.karyon.accesslog.dto.helpers;
+package com.scmspain.karyon.accesslog.helpers;
 
 import com.netflix.governator.annotations.Modules;
 import com.scmspain.karyon.accesslog.interceptors.AccessLogInterceptor;

@@ -1,4 +1,4 @@
-package com.scmspain.karyon.accesslog.dto;
+package com.scmspain.karyon.accesslog;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;

@@ -1,8 +1,10 @@
 package com.scmspain.karyon.accesslog.interceptors;
 
 import com.google.inject.Inject;
-import com.scmspain.karyon.accesslog.dto.AccessLog;
+import com.google.inject.Injector;
+import com.scmspain.karyon.accesslog.AccessLog;
 import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
+import com.scmspain.karyon.accesslog.formatters.CombinedApacheLog;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AttributeKey;
@@ -21,12 +23,18 @@ public class AccessLogInterceptor
     implements DuplexInterceptor<HttpServerRequest<ByteBuf>, HttpServerResponse<ByteBuf>> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AccessLogInterceptor.class);
+  private static final Class<? extends AccessLogFormatter>
+      DEFAULT_FORMATTER = CombinedApacheLog.class;
+
   public static AttributeKey<AccessLog> accessAttribute = AttributeKey.valueOf("accessAttribute");
   private final AccessLogFormatter logFormatter;
+  @Inject private Injector injector;
 
   @Inject
   AccessLogInterceptor(AccessLogFormatter logFormatter) {
-    this.logFormatter = logFormatter;
+    this.logFormatter = (null != logFormatter)
+      ? logFormatter
+      : injector.getInstance(DEFAULT_FORMATTER);
   }
 
   @Override
