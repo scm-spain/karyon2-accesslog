@@ -23,6 +23,6 @@ public class CombinedApacheLog implements AccessLogFormatter {
   }
 
   private String valueOrDefault(String value) {
-    return (!value.isEmpty()) ? value : "-";
+    return (null != value && !value.isEmpty()) ? value : "-";
   }
 }
