@@ -8,7 +8,7 @@ First of all, add to your **build.gradle** the dependency:
 ```
 dependencies {
   ...
-  compile 'com.scmspain.karyon:ms-accesslog-interceptor-module:0.1'
+  compile 'com.scmspain:karyon-accesslog-interceptor-module:0.1.0'
 }
 ```
 
