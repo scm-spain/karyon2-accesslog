@@ -46,9 +46,6 @@ publishing {
 
 scmVersion {
     ignoreUncommittedChanges = false
-    tag {
-        prefix = project.name
-    }
 }
 
 
