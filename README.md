@@ -26,6 +26,16 @@ public interface AppServer {
 }
 ```
 
+And finally intercept all urls:
+
+```java
+@Override
+protected void configureServer() {
+  ...
+  interceptorSupport().forUri("/*").intercept(AccessLogInterceptor.class);
+}
+```
+
 ### Log Formatter
 By default **CombinedApacheLog** format is bind, but you can override this in your module as follows:
 
