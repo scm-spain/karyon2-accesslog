@@ -1,0 +1,59 @@
+/*
+ * Gradle script for publish versions to artifactory/local-maven
+ * Please, specified scmVersion variable in your script
+ */
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// Task publishMavenJavaPublicationToMavenRepository is added in runtime so doFirst doesn't work propertly and must be done this way
+tasks.whenTaskAdded { t ->
+    if( t.name == "publishMavenJavaPublicationToMavenRepository"){
+        if (!project.hasProperty('artifactory_scm_user') || !project.hasProperty('artifactory_scm_password')) {
+            throw new GradleException("Properties 'artifactory_scm_user' and 'artifactory_scm_password' are mandatory to do a publish, please add this information in your ~/.gradle/gradle.properties")
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.scmspain'
+            version project.version
+
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username project.hasProperty('artifactory_scm_user')? artifactory_scm_user: ''
+                password project.hasProperty('artifactory_scm_password')? artifactory_scm_password: ''
+            }
+            url "http://artifactory.scmspain.com/artifactory/libs-release-ms"
+        }
+    }
+}
+
+scmVersion {
+    ignoreUncommittedChanges = false
+    tag {
+        prefix = project.name
+    }
+}
+
+
+allprojects {
+    //To force version from command line
+    //>gradle markNextVersion -Prelease.nextVersion=X.X.X
+    project.version = scmVersion.version
+}
