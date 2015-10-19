@@ -8,14 +8,14 @@ public class CommonApacheLog implements AccessLogFormatter{
   @Override
   public String format(AccessLog logLine) {
     return String.format(
-      "%s - - [%s] \"%s %s %s\" %d %f",
+      "%s - - [%s] \"%s %s %s\" %d %d",
       logLine.clientIp(),
       new SimpleDateFormat("dd/MM/yyyy:HH:mm:ss.SSS Z").format(logLine.date()),
       logLine.method(),
       logLine.uri(),
       logLine.httpVersion(),
       logLine.statusCode(),
-      (float) 0
+      (long) 0
     );
   }
 }
