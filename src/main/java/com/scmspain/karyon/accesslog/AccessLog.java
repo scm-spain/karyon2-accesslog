@@ -1,4 +1,4 @@
-package com.scmspain.karyon.accesslog.dto;
+package com.scmspain.karyon.accesslog;
 
 import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
 

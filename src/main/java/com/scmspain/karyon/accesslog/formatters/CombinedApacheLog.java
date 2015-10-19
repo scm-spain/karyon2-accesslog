@@ -1,7 +1,7 @@
 package com.scmspain.karyon.accesslog.formatters;
 
 import com.google.inject.Inject;
-import com.scmspain.karyon.accesslog.dto.AccessLog;
+import com.scmspain.karyon.accesslog.AccessLog;
 
 public class CombinedApacheLog implements AccessLogFormatter {
 
@@ -14,6 +14,15 @@ public class CombinedApacheLog implements AccessLogFormatter {
 
   @Override
   public String format(AccessLog logLine) {
-    return String.format("%s \"%s\" \"%s\"", commonApacheLogFormatter.format(logLine), logLine.referer(), logLine.userAgent());
+    return String.format(
+      "%s \"%s\" \"%s\"",
+      commonApacheLogFormatter.format(logLine),
+      valueOrDefault(logLine.referer()),
+      valueOrDefault(logLine.userAgent())
+    );
+  }
+
+  private String valueOrDefault(String value) {
+    return (null != value && !value.isEmpty()) ? value : "-";
   }
 }

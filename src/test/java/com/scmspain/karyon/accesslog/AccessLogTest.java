@@ -1,4 +1,4 @@
-package com.scmspain.karyon.accesslog.dto;
+package com.scmspain.karyon.accesslog;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
@@ -68,7 +68,17 @@ public class AccessLogTest {
   }
 
   private void whenAccessLogIsCreatedWithResponseInfo() {
-    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent, referer, statusCode, timeTaken, responseSize);
+    log = new AccessLog(
+        httpVersion,
+        method,
+        uri,
+        clientIp,
+        userAgent,
+        referer,
+        statusCode,
+        timeTaken,
+        responseSize
+    );
   }
 
   private void thenLogShouldContainRequestInformation() {

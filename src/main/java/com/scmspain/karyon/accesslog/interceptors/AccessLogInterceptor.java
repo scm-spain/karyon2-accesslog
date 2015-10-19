@@ -1,8 +1,10 @@
 package com.scmspain.karyon.accesslog.interceptors;
 
 import com.google.inject.Inject;
-import com.scmspain.karyon.accesslog.dto.AccessLog;
+import com.google.inject.Injector;
+import com.scmspain.karyon.accesslog.AccessLog;
 import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
+import com.scmspain.karyon.accesslog.formatters.CombinedApacheLog;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AttributeKey;
@@ -21,12 +23,19 @@ public class AccessLogInterceptor
     implements DuplexInterceptor<HttpServerRequest<ByteBuf>, HttpServerResponse<ByteBuf>> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AccessLogInterceptor.class);
+  private static final Class<? extends AccessLogFormatter>
+      DEFAULT_FORMATTER = CombinedApacheLog.class;
+
   public static AttributeKey<AccessLog> accessAttribute = AttributeKey.valueOf("accessAttribute");
   private final AccessLogFormatter logFormatter;
 
   @Inject
-  AccessLogInterceptor(AccessLogFormatter logFormatter) {
-    this.logFormatter = logFormatter;
+  AccessLogInterceptor(Injector injector, AccessLogFormatterHolder logFormatterHolder) {
+    if (null == logFormatterHolder.value) {
+      logFormatterHolder.value = injector.getInstance(DEFAULT_FORMATTER);
+    }
+
+    this.logFormatter = logFormatterHolder.value;
   }
 
   @Override
@@ -43,7 +52,8 @@ public class AccessLogInterceptor
 
   @Override
   public Observable<Void> out(HttpServerResponse<ByteBuf> response) {
-    AccessLog logLine = buildAccessLogWith(response, response.getChannel().attr(accessAttribute).get());
+    AccessLog logLine = buildAccessLogWith(
+        response, response.getChannel().attr(accessAttribute).get());
 
     // TODO: gather and log response bytes.
     LOGGER.info(logLine.format(logFormatter));
@@ -74,5 +84,9 @@ public class AccessLogInterceptor
       Duration.between(accessLog.date().toInstant(), Instant.now()).toMillis(),
       (long) 0
     );
+  }
+
+  private static class AccessLogFormatterHolder {
+    @Inject(optional = true) AccessLogFormatter value;
   }
 }
