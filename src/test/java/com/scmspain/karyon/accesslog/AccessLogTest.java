@@ -23,26 +23,45 @@ public class AccessLogTest {
   private AccessLog log;
 
   @Test
-  public void testItShouldBeBuiltRequestInformation() throws Exception {
+  public void itShouldBeBuiltRequestInformation() throws Exception {
     givenARequest();
     whenAccessLogIsCreated();
     thenLogShouldContainRequestInformation();
   }
 
   @Test
-  public void testItShouldBeBuiltWithUserInformation() throws Exception {
+  public void itShouldBeBuiltWithUserInformation() throws Exception {
     givenARequestWithUserInformation();
     whenAccessLogIsCreatedWithUserInfo();
     thenLogShouldContainUserInformation();
   }
 
   @Test
-  public void testItShouldBeBuiltWithResponseInformation() throws Exception {
+  public void itShouldBeBuiltWithResponseInformation() throws Exception {
     givenARequest();
     statusCode = 200;
     timeTaken = (long) 123456;
     responseSize = (long) 123456;
     whenAccessLogIsCreatedWithResponseInfo();
+    thenLogShouldContainResponseInformation();
+  }
+
+  @Test
+  public void itShouldContainsAClientByDefault() throws Exception {
+    givenARequest();
+    clientIp = "";
+    userAgent = "-";
+    referer = "-";
+    whenAccessLogIsCreated();
+    thenLogShouldContainUserInformation();
+  }
+
+  @Test
+  public void itShouldContainsAResponseByDefault() throws Exception {
+    givenARequest();
+    statusCode = 0;
+    responseSize = (long) 0;
+    whenAccessLogIsCreated();
     thenLogShouldContainResponseInformation();
   }
 
