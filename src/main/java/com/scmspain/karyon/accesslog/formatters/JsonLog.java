@@ -24,7 +24,7 @@ public class JsonLog implements AccessLogFormatter {
     Map<String, String> accessLogMapped = new HashMap<>();
     accessLogMapped.put("clientIp", logLine.clientIp());
     accessLogMapped.put("date",
-      new SimpleDateFormat("dd/MM/yyyy:HH:mm:ss.SSS Z").format(Date.from(logLine.date())));
+        new SimpleDateFormat("dd/MM/yyyy:HH:mm:ss.SSS Z").format(Date.from(logLine.date())));
     accessLogMapped.put("method", logLine.method());
     accessLogMapped.put("uri", logLine.uri());
     accessLogMapped.put("httpVersion", logLine.httpVersion());
