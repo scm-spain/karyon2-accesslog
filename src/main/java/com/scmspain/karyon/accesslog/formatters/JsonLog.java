@@ -28,6 +28,7 @@ public class JsonLog implements AccessLogFormatter {
     accessLogMapped.put("method", logLine.method());
     accessLogMapped.put("uri", logLine.uri());
     accessLogMapped.put("httpVersion", logLine.httpVersion());
+    accessLogMapped.put("statusCode", String.valueOf(logLine.statusCode()));
     accessLogMapped.put("referrer", String.valueOf(logLine.referer()));
     accessLogMapped.put("userAgent", logLine.userAgent());
     accessLogMapped.put("responseSize", String.valueOf(logLine.responseSize()));
