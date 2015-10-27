@@ -1,45 +1,50 @@
 /*
- * Gradle script for publish versions to artifactory/local-maven
+ * Gradle script for publish versions to maven central
  * Please, specified scmVersion variable in your script
  */
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
+
+
+nexusStaging {
+    packageGroup = "com.scmspain" //optional if packageGroup == project.getGroup()
+    stagingProfileId = "7dd4d052409ec" //when not defined will be got from server using "packageGroup"
 }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+modifyPom {
+    project {
+        name 'com.scmspain.karyon:karyon2-accesslog'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description 'This module add an Interceptor to Karyon so that log all requests.'
+        url 'https://github.com/scm-spain/karyon2-accesslog'
 
-// Task publishMavenJavaPublicationToMavenRepository is added in runtime so doFirst doesn't work propertly and must be done this way
-tasks.whenTaskAdded { t ->
-    if( t.name == "publishMavenJavaPublicationToMavenRepository"){
-        if (!project.hasProperty('artifactory_scm_user') || !project.hasProperty('artifactory_scm_password')) {
-            throw new GradleException("Properties 'artifactory_scm_user' and 'artifactory_scm_password' are mandatory to do a publish, please add this information in your ~/.gradle/gradle.properties")
+        scm {
+            connection 'scm:git@github.com:scm-spain/karyon2-accesslog.git'
+            developerConnection 'scm:git@github.com:scm-spain/karyon2-accesslog.git'
+            url 'https://github.com/scm-spain/karyon2-accesslog'
         }
-    }
-}
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'com.scmspain'
-            version project.version
-
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
-    repositories {
-        maven {
-            credentials {
-                username project.hasProperty('artifactory_scm_user')? artifactory_scm_user: ''
-                password project.hasProperty('artifactory_scm_password')? artifactory_scm_password: ''
+        licenses {
+            license {
+                name 'The Apache License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
             }
-            url "http://artifactory.scmspain.com/artifactory/libs-release-ms"
+        }
+
+        developers {
+            developer {
+                id 'aramirez-es'
+                name 'Alberto Ramirez'
+                email 'alberto.ramirez@scmspain.com'
+                organization 'SCM Spain'
+                organizationUrl 'http://www.scmspain.com/'
+            }
+            developer {
+                id 'victuxbb'
+                name 'Victor Caldentey'
+                email 'victor.caldentey@scmspain.com'
+                organization 'SCM Spain'
+                organizationUrl 'http://www.scmspain.com/'
+            }
         }
     }
 }
