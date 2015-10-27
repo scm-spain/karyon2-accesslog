@@ -26,7 +26,8 @@ public class AccessLogInterceptor
   private static final Class<? extends AccessLogFormatter>
       DEFAULT_FORMATTER = CombinedApacheLog.class;
 
-  public static AttributeKey<AccessLog> accessAttribute = AttributeKey.valueOf("accessAttribute");
+  public static AttributeKey<AccessLog> accessAttribute =
+      AttributeKey.newInstance("accessAttribute");
   private final AccessLogFormatter logFormatter;
 
   @Inject
@@ -45,7 +46,7 @@ public class AccessLogInterceptor
   ) {
 
     AccessLog logLine = buildAccessLogWith(request);
-    response.getChannel().attr(accessAttribute).setIfAbsent(logLine);
+    response.getChannel().attr(accessAttribute).set(logLine);
 
     return Observable.empty();
   }
@@ -53,7 +54,7 @@ public class AccessLogInterceptor
   @Override
   public Observable<Void> out(HttpServerResponse<ByteBuf> response) {
     AccessLog logLine = buildAccessLogWith(
-        response, response.getChannel().attr(accessAttribute).get());
+        response, response.getChannel().attr(accessAttribute).getAndRemove());
 
     // TODO: gather and log response bytes.
     LOGGER.info(logLine.format(logFormatter));
@@ -81,7 +82,7 @@ public class AccessLogInterceptor
       accessLog.userAgent(),
       accessLog.referer(),
       response.getStatus().code(),
-      Duration.between(accessLog.date().toInstant(), Instant.now()).toMillis(),
+      Duration.between(accessLog.date(), Instant.now()).toMillis(),
       (long) 0
     );
   }
