@@ -2,17 +2,21 @@
 
 [![Build Status](https://travis-ci.org/scm-spain/karyon2-accesslog.svg)](https://travis-ci.org/scm-spain/karyon2-accesslog)
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.scmspain.karyon/karyon2-accesslog/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.scmspain.karyon/karyon2-accesslog)
+
 This module add an Interceptor to [Karyon](https://github.com/Netflix/karyon) so that log all requests.
  
 ## How to use
 
-First of all, add to your **build.gradle** the dependency:
+First of all, add to your **build.gradle** the dependency as usually do, for example:
 ```
 dependencies {
   ...
-  compile 'com.scmspain:karyon2-accesslog:0.1.0'
+  compile 'com.scmspain.karyon:karyon2-accesslog:x.x.x'
 }
 ```
+Remember to check the maven central badge to get the latest version.
+
 
 Then include **AccessLogModule** in your AppServer as follows:
 
