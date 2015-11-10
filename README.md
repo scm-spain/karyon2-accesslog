@@ -57,3 +57,4 @@ protected void configure() {
 * **JsonLog** print the Access log as a Json.
 * **CommonApacheLog** print a default Apache Access log.
 * **CombinedApacheLog** print a Combined Apache Access log (common plus referrer and user agent).
+* **SchibstedApacheLog** print a Custom Access log showing Combined Access Log plus extra information like response time and response size.
