@@ -5,7 +5,7 @@ import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
 import java.time.Instant;
 
 public class AccessLog {
-  private Long timeTaken;
+  private Long timeTaken = 0L;
   private final Instant timestamp = Instant.now();
   private RequestBag request;
   private ResponseBag response;
@@ -103,7 +103,7 @@ public class AccessLog {
 
   private class ResponseBag {
 
-    private final Long responseSize;
+    private Long responseSize = 0L;
     private final Integer statusCode;
 
     public ResponseBag(Integer statusCode, Long responseSize) {
