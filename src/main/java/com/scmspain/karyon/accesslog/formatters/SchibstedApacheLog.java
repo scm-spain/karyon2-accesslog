@@ -15,7 +15,7 @@ public class SchibstedApacheLog implements AccessLogFormatter {
   @Override
   public String format(AccessLog logLine) {
     return String.format(
-      "%s \"%l\" \"%l\"",
+      "%s \"%d\" \"%d\"",
       combinedApacheLogFormatter.format(logLine),
       logLine.responseSize(),
       logLine.timeTaken()
