@@ -60,6 +60,7 @@ public class AccessLogTest {
   public void itShouldContainsAResponseByDefault() throws Exception {
     givenARequest();
     statusCode = 0;
+    timeTaken = (long) 0;
     responseSize = (long) 0;
     whenAccessLogIsCreated();
     thenLogShouldContainResponseInformation();
