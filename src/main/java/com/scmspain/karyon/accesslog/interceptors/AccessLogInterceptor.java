@@ -100,7 +100,7 @@ public class AccessLogInterceptor
 
   private String getIpAddressFromSocket(HttpServerRequest<ByteBuf> request) {
 
-    String ipAddress = null;
+    String ipAddress = "";
     SocketAddress remoteAddr = request.getNettyChannel().remoteAddress();
 
     if (remoteAddr instanceof InetSocketAddress) {
