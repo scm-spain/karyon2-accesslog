@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 public class AccessLogInterceptor
     implements DuplexInterceptor<HttpServerRequest<ByteBuf>, HttpServerResponse<ByteBuf>> {
@@ -67,11 +69,12 @@ public class AccessLogInterceptor
       request.getHttpVersion().toString(),
       request.getHttpMethod().toString(),
       request.getUri(),
-      ((InetSocketAddress) request.getNettyChannel().remoteAddress()).getAddress().getHostAddress(),
+      getIpAddressFromProxy(request).orElse(getIpAddressFromSocket(request)),
       request.getHeaders().getHeader(HttpHeaders.Names.USER_AGENT),
       request.getHeaders().getHeader(HttpHeaders.Names.REFERER)
     );
   }
+
 
   private AccessLog buildAccessLogWith(HttpServerResponse<ByteBuf> response, AccessLog accessLog) {
     return new AccessLog(
@@ -85,6 +88,27 @@ public class AccessLogInterceptor
       Duration.between(accessLog.date(), Instant.now()).toMillis(),
       (long) 0
     );
+  }
+
+
+  private Optional<String> getIpAddressFromProxy(HttpServerRequest<ByteBuf> request) {
+    return Optional.ofNullable(request.getHeaders().get("X-FORWARDED-FOR"))
+      .map(ipValuesFromProxy -> ipValuesFromProxy.split(","))
+      .filter(ipsAsArray -> ipsAsArray.length > 0)
+      .map(ipsAsArray -> ipsAsArray[0].trim());
+  }
+
+  private String getIpAddressFromSocket(HttpServerRequest<ByteBuf> request) {
+
+    String ipAddress = null;
+    SocketAddress remoteAddr = request.getNettyChannel().remoteAddress();
+
+    if (remoteAddr instanceof InetSocketAddress) {
+      InetSocketAddress inetSock = (InetSocketAddress) remoteAddr;
+      ipAddress = inetSock.getHostString(); // Don't use hostname that does a DNS lookup.
+    }
+
+    return ipAddress;
   }
 
   private static class AccessLogFormatterHolder {

@@ -3,6 +3,7 @@ package com.scmspain.karyon.accesslog;
 import com.netflix.governator.guice.BootstrapModule;
 import com.scmspain.karyon.accesslog.helpers.AppServerForTesting;
 import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
@@ -10,9 +11,12 @@ import io.reactivex.netty.protocol.http.client.HttpClientResponse;
 import netflix.karyon.Karyon;
 import netflix.karyon.KaryonServer;
 import org.hamcrest.CustomMatcher;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import rx.Observable;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
@@ -27,9 +31,10 @@ import static org.mockito.Mockito.verify;
 public class AccessLogIntegrationTest {
   private static KaryonServer server;
   private static AccessLogFormatter mockedFormatter;
+  private static final  String IP_FOR_TEST = "8.8.8.8";
 
-  @BeforeClass
-  public static void setUpBefore() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     mockedFormatter = mock(AccessLogFormatter.class);
 
     BootstrapModule[] bootstrapModules = {
@@ -40,8 +45,8 @@ public class AccessLogIntegrationTest {
     server.start();
   }
 
-  @AfterClass
-  public static void cleanUpAfter() throws Exception {
+  @After
+  public  void cleanUp() throws Exception {
     server.shutdown();
   }
 
@@ -50,6 +55,47 @@ public class AccessLogIntegrationTest {
 
     givenAnIncomingRequest();
     thenRequestIsLogged();
+  }
+
+  @Test
+  public void itShouldLogIPfromHttpHeaderIfExist() {
+    givenAnIncominRequestWithX_Forwarded_For();
+    thenRequestIsLoggedWithIpFromXForwarded();
+  }
+
+  @Test
+  public void itShouldLogIpFromRequestIfExist() {
+    givenAnIncomingRequest();
+    thenRequestIsLoggedWithIpFromRequest();
+  }
+
+
+  private void thenRequestIsLoggedWithIpFromXForwarded() {
+    verify(mockedFormatter).format(argThat(new CustomMatcher<AccessLog>("") {
+      @Override
+      public boolean matches(Object item) {
+        AccessLog logLine = (AccessLog) item;
+        return logLine.clientIp().equals(IP_FOR_TEST);
+      }
+    }));
+  }
+
+  private void thenRequestIsLoggedWithIpFromRequest() {
+    verify(mockedFormatter).format(argThat(new CustomMatcher<AccessLog>("") {
+      @Override
+      public boolean matches(Object item) {
+        AccessLog logLine = (AccessLog) item;
+        return logLine.clientIp().equals("127.0.0.1");
+      }
+    }));
+  }
+
+  private void givenAnIncominRequestWithX_Forwarded_For() {
+    Observable<HttpClientResponse<ByteBuf>> clientResponse =
+        RxNetty.createHttpClient("localhost", AppServerForTesting.AppServer.DEFAULT_PORT)
+          .submit(HttpClientRequest.createGet("/sample").withHeader("X-FORWARDED-FOR",IP_FOR_TEST));
+
+    processRequest(clientResponse);
   }
 
   private void thenRequestIsLogged() {
@@ -64,14 +110,21 @@ public class AccessLogIntegrationTest {
     }));
   }
 
-  private void givenAnIncomingRequest() {
-    RxNetty.createHttpClient("localhost", AppServerForTesting.AppServer.DEFAULT_PORT)
-        .submit(HttpClientRequest.createGet("/sample"))
-        .doOnNext(response -> assertThat(response.getStatus(), is(HttpResponseStatus.OK)))
-        .flatMap(HttpClientResponse::getContent)
-        .map(content -> content.toString(Charset.defaultCharset()))
-        .timeout(5, TimeUnit.SECONDS)
-        .toBlocking()
-        .single();
+  private void processRequest(Observable<HttpClientResponse<ByteBuf>> clientResponse) {
+    clientResponse.doOnNext(response -> assertThat(response.getStatus(), is(HttpResponseStatus.OK)))
+      .flatMap(HttpClientResponse::getContent)
+      .map(content -> content.toString(Charset.defaultCharset()))
+      .timeout(5, TimeUnit.SECONDS)
+      .toBlocking()
+      .single();
   }
+
+  private void givenAnIncomingRequest() {
+    Observable<HttpClientResponse<ByteBuf>> clientResponse =
+        RxNetty.createHttpClient("localhost", AppServerForTesting.AppServer.DEFAULT_PORT)
+          .submit(HttpClientRequest.createGet("/sample"));
+    processRequest(clientResponse);
+  }
+
+
 }
