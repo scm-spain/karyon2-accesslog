@@ -16,6 +16,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import rx.Observable;
 
 import java.nio.charset.Charset;
@@ -33,8 +34,8 @@ public class AccessLogIntegrationTest {
   private static AccessLogFormatter mockedFormatter;
   private static final  String IP_FOR_TEST = "8.8.8.8";
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeClass
+  public static void setUpBefore() throws Exception {
     mockedFormatter = mock(AccessLogFormatter.class);
 
     BootstrapModule[] bootstrapModules = {
@@ -45,9 +46,15 @@ public class AccessLogIntegrationTest {
     server.start();
   }
 
-  @After
-  public  void cleanUp() throws Exception {
+  @AfterClass
+  public  static void cleanUpAfter() throws Exception {
     server.shutdown();
+  }
+
+
+  @After
+  public void cleanUp() throws Exception {
+    Mockito.reset(mockedFormatter);
   }
 
   @Test
