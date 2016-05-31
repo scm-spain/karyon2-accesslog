@@ -3,6 +3,8 @@ package com.scmspain.karyon.accesslog.formatters;
 import com.google.inject.Inject;
 import com.scmspain.karyon.accesslog.AccessLog;
 
+import java.lang.ref.ReferenceQueue;
+
 public class SchibstedApacheLog implements AccessLogFormatter {
 
   private CombinedApacheLog combinedApacheLogFormatter;
@@ -14,11 +16,15 @@ public class SchibstedApacheLog implements AccessLogFormatter {
 
   @Override
   public String format(AccessLog logLine) {
+
+
+
     return String.format(
-      "%s %d %d",
+      "%s %d \"%s\" \"%s\"",
       combinedApacheLogFormatter.format(logLine),
-      logLine.responseSize(),
-      logLine.timeTaken()
+      logLine.timeTaken(),
+      logLine.zipkinParentId(),
+      logLine.zipkinTraceId()
     );
   }
 

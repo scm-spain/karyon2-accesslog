@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 
+import java.io.DataOutputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.time.Duration;
@@ -27,6 +28,9 @@ public class AccessLogInterceptor
   private static final Logger LOGGER = LoggerFactory.getLogger(AccessLogInterceptor.class);
   private static final Class<? extends AccessLogFormatter>
       DEFAULT_FORMATTER = CombinedApacheLog.class;
+
+  public static final String ZIPKIN_X_PARENT_ID   =   "X-Parent-Id";
+  public static final String ZIPKIN_X_TRACE_ID    =   "X-Trace-Id";
 
   public static AttributeKey<AccessLog> accessAttribute =
       AttributeKey.newInstance("accessAttribute");
@@ -71,7 +75,9 @@ public class AccessLogInterceptor
       request.getUri(),
       getIpAddressFromProxy(request).orElse(getIpAddressFromSocket(request)),
       request.getHeaders().getHeader(HttpHeaders.Names.USER_AGENT),
-      request.getHeaders().getHeader(HttpHeaders.Names.REFERER)
+      request.getHeaders().getHeader(HttpHeaders.Names.REFERER),
+      request.getHeaders().getHeader(ZIPKIN_X_PARENT_ID),
+      request.getHeaders().getHeader(ZIPKIN_X_TRACE_ID)
     );
   }
 
@@ -86,7 +92,9 @@ public class AccessLogInterceptor
       accessLog.referer(),
       response.getStatus().code(),
       Duration.between(accessLog.date(), Instant.now()).toMillis(),
-      (long) 0
+      (long) 0, 
+      accessLog.zipkinParentId(),
+      accessLog.zipkinTraceId()
     );
   }
 
