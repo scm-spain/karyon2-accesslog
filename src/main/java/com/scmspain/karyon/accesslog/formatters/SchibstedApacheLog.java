@@ -23,9 +23,13 @@ public class SchibstedApacheLog implements AccessLogFormatter {
       "%s %d \"%s\" \"%s\"",
       combinedApacheLogFormatter.format(logLine),
       logLine.timeTaken(),
-      logLine.zipkinParentId(),
-      logLine.zipkinTraceId()
+      valueOrDefault(logLine.zipkinParentId()),
+      valueOrDefault(logLine.zipkinTraceId())
     );
+  }
+
+  private String valueOrDefault(String value) {
+    return (null != value && !value.isEmpty()) ? value : "-";
   }
 
 }
