@@ -10,6 +10,7 @@ public class AccessLog {
   private RequestBag request;
   private ResponseBag response;
   private ClientBag client;
+  private TraceBag traceBag;
 
   public AccessLog(String httpVersion, String method, String uri) {
     this.request = new RequestBag(httpVersion, method, uri);
@@ -23,10 +24,13 @@ public class AccessLog {
       String uri,
       String clientIp,
       String userAgent,
-      String referer
+      String referer,
+      String zipkinParentId,
+      String zipkinTraceId
   ) {
     this(httpVersion, method, uri);
     this.client = new ClientBag(clientIp, userAgent, referer);
+    this.traceBag = new TraceBag(zipkinParentId, zipkinTraceId);
   }
 
   public AccessLog(
@@ -38,9 +42,11 @@ public class AccessLog {
           String referer,
           Integer statusCode,
           Long timeTaken,
-          Long responseSize
+          Long responseSize,
+          String zipkinParentId,
+          String zipkinTraceId
   ) {
-    this(httpVersion, method, uri, clientIp, userAgent, referer);
+    this(httpVersion, method, uri, clientIp, userAgent, referer, zipkinParentId, zipkinTraceId);
     this.response = new ResponseBag(statusCode, responseSize);
     this.timeTaken = timeTaken;
   }
@@ -85,6 +91,14 @@ public class AccessLog {
     return this.response.responseSize;
   }
 
+  public String zipkinParentId() {
+    return this.traceBag.getxParentId();
+  }
+
+  public String zipkinTraceId() {
+    return this.traceBag.getxTraceId();
+  }
+
   public String format(AccessLogFormatter logFormatter) {
     return logFormatter.format(this);
   }
@@ -122,6 +136,24 @@ public class AccessLog {
       this.ip = clientIp;
       this.userAgent = userAgent;
       this.referer = referer;
+    }
+  }
+
+  private class TraceBag {
+    private String zipkinParentId;
+    private String zipkinTraceId;
+
+    public TraceBag(String zipkinParentId, String zipkinTraceId) {
+      this.zipkinParentId = zipkinParentId;
+      this.zipkinTraceId = zipkinTraceId;
+    }
+
+    public String getxParentId() {
+      return zipkinParentId;
+    }
+
+    public String getxTraceId() {
+      return zipkinTraceId;
     }
   }
 }

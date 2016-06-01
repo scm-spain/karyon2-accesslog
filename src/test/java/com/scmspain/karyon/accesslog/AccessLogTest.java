@@ -4,6 +4,8 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -20,6 +22,9 @@ public class AccessLogTest {
   private Long timeTaken;
   private Long responseSize;
 
+  private String zipkinParentId;
+  private String zipkinTraceId;
+
   private AccessLog log;
 
   @Test
@@ -34,6 +39,7 @@ public class AccessLogTest {
     givenARequestWithUserInformation();
     whenAccessLogIsCreatedWithUserInfo();
     thenLogShouldContainUserInformation();
+    thenShouldContainTraceInformation();
   }
 
   @Test
@@ -44,6 +50,7 @@ public class AccessLogTest {
     responseSize = (long) 123456;
     whenAccessLogIsCreatedWithResponseInfo();
     thenLogShouldContainResponseInformation();
+    thenShouldContainTraceInformation();
   }
 
   @Test
@@ -66,10 +73,13 @@ public class AccessLogTest {
     thenLogShouldContainResponseInformation();
   }
 
+
   private void givenARequest() {
     httpVersion = HttpVersion.HTTP_1_0.toString();
     method = HttpMethod.GET.toString();
     uri = "/status";
+    zipkinParentId = UUID.randomUUID().toString();
+    zipkinTraceId = UUID.randomUUID().toString();
   }
 
   private void givenARequestWithUserInformation() {
@@ -84,7 +94,8 @@ public class AccessLogTest {
   }
 
   private void whenAccessLogIsCreatedWithUserInfo() {
-    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent, referer);
+    log = new AccessLog(httpVersion, method, uri, clientIp, userAgent, referer,
+        zipkinParentId, zipkinTraceId);
   }
 
   private void whenAccessLogIsCreatedWithResponseInfo() {
@@ -97,7 +108,9 @@ public class AccessLogTest {
         referer,
         statusCode,
         timeTaken,
-        responseSize
+        responseSize,
+        zipkinParentId,
+        zipkinTraceId
     );
   }
 
@@ -117,5 +130,10 @@ public class AccessLogTest {
     assertThat(log.statusCode(), is(statusCode));
     assertThat(log.timeTaken(), is(timeTaken));
     assertThat(log.responseSize(), is(responseSize));
+  }
+
+  private void thenShouldContainTraceInformation() {
+    assertThat(log.zipkinParentId(), is(zipkinParentId));
+    assertThat(log.zipkinTraceId(), is(zipkinTraceId));
   }
 }

@@ -6,6 +6,7 @@ import com.scmspain.karyon.accesslog.formatters.AccessLogFormatter;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.protocol.http.client.HttpClient;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import io.reactivex.netty.protocol.http.client.HttpClientResponse;
 import netflix.karyon.Karyon;
@@ -33,6 +34,8 @@ public class AccessLogIntegrationTest {
   private static KaryonServer server;
   private static AccessLogFormatter mockedFormatter;
   private static final  String IP_FOR_TEST = "8.8.8.8";
+  private String zipkinParentId  = "666";
+  private String zipkinTraceId   = "777";
 
   @BeforeClass
   public static void setUpBefore() throws Exception {
@@ -112,7 +115,9 @@ public class AccessLogIntegrationTest {
         AccessLog logLine = (AccessLog) item;
         return logLine.method().equals("GET")
           && logLine.statusCode().equals(200)
-          && logLine.uri().equals("/sample");
+          && logLine.uri().equals("/sample")
+          && logLine.zipkinParentId().equals(zipkinParentId)
+          && logLine.zipkinTraceId().equals(zipkinTraceId);
       }
     }));
   }
@@ -127,9 +132,12 @@ public class AccessLogIntegrationTest {
   }
 
   private void givenAnIncomingRequest() {
+
     Observable<HttpClientResponse<ByteBuf>> clientResponse =
         RxNetty.createHttpClient("localhost", AppServerForTesting.AppServer.DEFAULT_PORT)
-          .submit(HttpClientRequest.createGet("/sample"));
+          .submit(HttpClientRequest.createGet("/sample")
+          .withHeader("X-Parent-Id", "666")
+          .withHeader("X-Trace-Id", "777"));
     processRequest(clientResponse);
   }
 
