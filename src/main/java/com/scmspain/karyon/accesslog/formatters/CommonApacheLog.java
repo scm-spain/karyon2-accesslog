@@ -11,7 +11,7 @@ public class CommonApacheLog implements AccessLogFormatter{
     return String.format(
       "%s - - [%s] \"%s %s %s\" %d %d",
       logLine.clientIp(),
-      new SimpleDateFormat("dd/MM/yyyy:HH:mm:ss.SSS Z").format(Date.from(logLine.date())),
+      new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z").format(Date.from(logLine.date())),
       logLine.method(),
       logLine.uri(),
       logLine.httpVersion(),
